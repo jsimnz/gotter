@@ -22,6 +22,8 @@ It uses the same syntax as `go get` so you should already be firmiliar with it. 
 gotter get github.com/jsimnz/gotter
 ```
 
+This will download your package using the go tool chain, create a symlink from your package folder in your `$GOPATH` and will update the remote origin URL.
+
 Notice that it uses the same syntax as `go get` for the URL. The package FQN. But it also supports other git URLs such as `git://URL`. `http(s)://URL`. and even `git@URL:repo.git`. If you use the latter URLs and not the FQN, It will keep the remote origin URL as is. 
 
 #### Just download
