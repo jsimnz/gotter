@@ -3,7 +3,7 @@
 
 A go command line tool to help you manage your go projects into a single and consistent workspace.
 
-# If you do the following...You probably need gotter
+### If you do the following...You probably need gotter
 - Have you Go projects in a seperate folder, and the rest of your projects in a 'workspace' folder because Go code needs to be in a valid `$GOPATH`
 - Like having your Go projects together in single folder, not in `$GOPATH/github.com/jsimnz/gotter`
 - Are always battling between wanting to `git clone` your repo or `go get`
@@ -35,7 +35,7 @@ This will use the go tool chain to download your package, just like before, but 
 gotter link github.com/jsimnz/gotter
 ```
 
-This will create a symlink from your $GOPATH/project to
+This will create a symlink from your $GOPATH/project to your $WORKSPACE/project
 
 #### For help
 ```
