@@ -32,7 +32,7 @@ func main() {
 	app.Name = "gotter"
 	app.Author = "John-Alan Simmons <simmons.johnalan@gmail.com>"
 	app.Usage = "Utlity to unify and manage Go projects into a single workspace"
-	app.Version = "0.1.0"
+	app.Version = "0.1.0-rc1"
 
 	// Overwrite default 'version' shorthand 'v' flag
 	cli.VersionFlag.Name = "version"
@@ -42,7 +42,7 @@ func main() {
 	}
 	app.Before = func(c *cli.Context) error {
 		cmd := c.Args().First()
-		if cmd == "" || cmd == "help" {
+		if cmd == "" || cmd == "help" || cmd == "h" {
 			return nil
 		}
 
