@@ -56,12 +56,12 @@ func main() {
 
 		// Make sure environment variable is set
 		if WORKSPACE == "" {
-			log.Error("[ERROR]: WORKSPACE enviromental variable not set!")
-			return errors.New("WORKSPACE enviromental variable not set!")
+			log.Error("[ERROR]: WORKSPACE enviroment variable not set!")
+			return errors.New("WORKSPACE enviroment variable not set!")
 		}
 		if GOPATH == "" {
-			log.Error("[ERROR]: GOPATH enviromental variable not set!")
-			return errors.New("GOPATH enviromental variable not set!")
+			log.Error("[ERROR]: GOPATH enviroment variable not set!")
+			return errors.New("GOPATH enviroment variable not set!")
 		}
 
 		return nil
