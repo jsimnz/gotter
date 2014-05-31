@@ -28,7 +28,6 @@ var (
 
 	getCommand = cli.Command{
 		Name:        "get",
-		ShortName:   "g",
 		Usage:       "'go get' a repo, and link it to your workspace",
 		Description: getCommandDesc,
 		Action: func(c *cli.Context) {
@@ -42,13 +41,13 @@ var (
 			cli.BoolFlag{"update, u", "Update existing code"},
 			cli.BoolFlag{"force, f", "Force updating and linking (Irreverseible)"},
 			cli.BoolFlag{"no-ssh", "Do not update the remote origin to use SSH"},
+			cli.StringFlag{"ssh-user", "git", "Set the user for the SSH url (Default: git)"},
 		},
 	}
 
 	cloneCommand = cli.Command{
-		Name:      "clone",
-		ShortName: "c",
-		Usage:     "Clone the repo into your GOPATH",
+		Name:  "clone",
+		Usage: "Clone the repo into your GOPATH",
 		Action: func(c *cli.Context) {
 			err := cloneCommandAction(c)
 			if err != nil {
@@ -62,9 +61,8 @@ var (
 	}
 
 	linkCommand = cli.Command{
-		Name:      "link",
-		ShortName: "l",
-		Usage:     "Create a link from the GOPATH/project to WORKSPACE/project",
+		Name:  "link",
+		Usage: "Create a link from the GOPATH/project to WORKSPACE/project",
 		Action: func(c *cli.Context) {
 			err := linkCommandAction(c)
 			if err != nil {
@@ -79,15 +77,17 @@ var (
 	}
 
 	updateRemoteCommand = cli.Command{
-		Name:      "update-remote",
-		ShortName: "u",
-		Usage:     "Updates the git remote origin url to use SSH",
+		Name:  "update-remote",
+		Usage: "Updates the git remote origin url to use SSH",
 		Action: func(c *cli.Context) {
 			err := updateRemoteCommandAction(c)
 			if err != nil {
 				exitStatus = FAIL
 				return
 			}
+		},
+		Flags: []cli.Flag{
+			cli.StringFlag{"ssh-user", "git", "Set the user for the SSH url (Default: git)"},
 		},
 	}
 )
@@ -200,8 +200,9 @@ func updateRemoteCommandAction(c *cli.Context) error {
 		return errors.New("Couldn't parse git remote origin url")
 	}
 
+	user := c.String("ssh-user")
+	newRepoURL := getSSHPath(repo, user)
 	os.Chdir(fullpkgpath)
-	newRepoURL := getSSHPath(repo)
 	cmd = exec.Command("git", "remote", "set-url", "origin", newRepoURL)
 	log.Debug(" ----> running: git remote set-url origin %v", newRepoURL)
 	err = cmd.Run()

@@ -92,9 +92,9 @@ func getPathType(path string) repoType {
 	}
 }
 
-func getSSHPath(path string) string {
+func getSSHPath(path, user string) string {
 	pkgpath := projectFromURL(path)
-	pkgpath = "git@" + pkgpath
+	pkgpath = user + "@" + pkgpath
 	if strings.Count(pkgpath, "/") > 2 {
 		pkgpath = pkgpath[:strings.LastIndex(pkgpath, "/")]
 	}
