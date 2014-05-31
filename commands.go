@@ -22,13 +22,15 @@ const (
 type repoType int
 
 var (
-	getCommand = cli.Command{
-		Name:      "get",
-		ShortName: "g",
-		Usage:     "'go get' a repo, and link it to your workspace",
-		Description: `Clones a package into your GOPATH using the go tool chain, and 
+	getCommandDesc = `Clones a package into your GOPATH using the go tool chain, 
    creates a link between it and your workspace, and if possible updates 
-   the repos remote origin to use SSH.`,
+   the repos remote origin to use SSH.`
+
+	getCommand = cli.Command{
+		Name:        "get",
+		ShortName:   "g",
+		Usage:       "'go get' a repo, and link it to your workspace",
+		Description: getCommandDesc,
 		Action: func(c *cli.Context) {
 			err := getCommandAction(c)
 			if err != nil {
