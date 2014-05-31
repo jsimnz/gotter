@@ -42,10 +42,10 @@ func main() {
 	}
 	app.Before = func(c *cli.Context) error {
 		cmd := c.Args().First()
-		if cmd == "" {
-			cli.ShowAppHelp(c)
+		if cmd == "" || cmd == "help" {
 			return nil
 		}
+
 		if c.Bool("extra-verbose") {
 			logging.SetLevel(logging.DEBUG, "gotter")
 		} else if c.Bool("verbose") {
