@@ -38,6 +38,7 @@ var (
 		Flags: []cli.Flag{
 			cli.BoolFlag{"update, u", "Update existing code"},
 			cli.BoolFlag{"force, f", "Force updating and linking (Irreverseible)"},
+			cli.BoolFlag{"no-ssh", "Do not update the remote origin to use SSH"},
 		},
 	}
 
@@ -94,16 +95,18 @@ func getCommandAction(c *cli.Context) error {
 	if err != nil {
 		return err
 	}
-	err = updateRemoteCommandAction(c)
-	if err != nil {
-		return err
+	if !c.Bool("no-ssh") {
+		err = updateRemoteCommandAction(c)
+		if err != nil {
+			return err
+		}
 	}
 	return nil
 }
 
 func cloneCommandAction(c *cli.Context) error {
 	pkgpath := projectFromURL(c.Args().First())
-	log.Debug("Getting package: %v", pkgpath)
+	log.Info("Getting package: %v", pkgpath)
 	var err error
 	if c.Bool("update") {
 		log.Debug(" ----> running %v", concat("go", " ", "get", " -u ", pkgpath))
@@ -123,7 +126,7 @@ func linkCommandAction(c *cli.Context) error {
 	pkgpath := projectFromURL(c.Args().First())
 	pkg := pkgFromPath(pkgpath)
 	workspacepath := concat(WORKSPACE, "/", pkg)
-	log.Debug("Linking package %v to %v", pkgpath, workspacepath)
+	log.Info("Linking package %v to %v", pkgpath, workspacepath)
 
 	fullpkgpath := getAbsPath(concat(GOPATH, "/src/", pkgpath))
 	fullworkspacepath := getAbsPath(workspacepath)
@@ -164,7 +167,7 @@ func updateRemoteCommandAction(c *cli.Context) error {
 	path := c.Args().First()
 	pkgpath := projectFromURL(path)
 	fullpkgpath := getAbsPath(concat(GOPATH, "/src/", pkgpath))
-	log.Debug("Update remote origin URL for repo: %v", pkgpath)
+	log.Info("Update remote origin URL for repo: %v", pkgpath)
 
 	os.Chdir(fullpkgpath)
 	cmd := exec.Command("git", "remote", "-v")

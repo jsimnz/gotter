@@ -2,6 +2,7 @@
 
 
 A go command line tool to help you manage your go projects into a single and consistent workspace.
+This tool is still under development
 
 ### If you do the following...You probably need gotter
 - Have you Go projects in a seperate folder, and the rest of your projects in a 'workspace' folder because Go code needs to be in a valid `$GOPATH`
@@ -16,6 +17,23 @@ A go command line tool to help you manage your go projects into a single and con
 It uses the same syntax as `go get` so you should already be firmiliar with it. When you call `gotter get` it uses the go toolchain to download your package/repo into it's appropriate fully quantified name folder. Then creates a symlink between that and a defined `$WORKSPACE`, and finally (TODO), if possible updates the `git remote origin` of the package to use ssh so you can use your public key authentication.
 
 ## Usage
+
+#### Notes
+$WORKSPACE, and $GOPATH enviroment variables must be set
+
+Example
+~
++-- Workspace/
+	+-- Go/
+		+-- bin/
+		+-- pkg/
+		+-- src/
+
+Then set your enviroment variables as follows
+```
+$ export WORKSPACE=~/Workspace
+$ export GOPATH=~/Workspace/Go
+```
 
 #### Download, link, and update origin URL of a Go package
 ```
@@ -39,7 +57,7 @@ $ gotter link github.com/jsimnz/gotter
 
 This will create a symlink from your $GOPATH/project to your $WORKSPACE/project
 
-#### Update remote origin to SSH
+#### Update remote origin to SSH (only)
 ```
 $ gotter update-remote github.com/jsimnz/gotter
 ```
@@ -50,6 +68,8 @@ This will update the local git repo's remote origin url to use SSH. This is only
 ```
 $ gotter --help OR gotter -h
 ```
+
+
 
 ## Install
 
@@ -64,6 +84,7 @@ $ sudo make install
 - ~~Finish remote origin URL update~~
 - ~~Expose remote origin as a sub command~~
 - Use config file to set `$WORKSPACE` and other settings
+- Write bootstrap script to generate a config file, move to /etc/gotter, and install tool
 
 ## License
 
