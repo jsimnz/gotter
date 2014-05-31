@@ -1,8 +1,8 @@
-# gotter
+# Gotter
 
 
 A go command line tool to help you manage your go projects into a single and consistent workspace.
-This tool is still under development
+This tool is still under development, but is currently stable enough to use (I do). Check out the [releases](https://github.com/jsimnz/gotter/releases) page.
 
 ### If you do the following...You probably need gotter
 - Have you Go projects in a seperate folder, and the rest of your projects in a 'workspace' folder because Go code needs to be in a valid `$GOPATH`
