@@ -181,7 +181,7 @@ func updateRemoteCommandAction(c *cli.Context) error {
 	endpoints := strings.Split(buf.String(), "\n")
 	var repo string
 	for _, line := range endpoints {
-		url, err := getGitOriginURL(line)
+		url, err := parseGitOriginURL(line)
 		if err == nil {
 			repo = url
 		}
@@ -190,18 +190,16 @@ func updateRemoteCommandAction(c *cli.Context) error {
 		log.Error("Couldn't parse git remote origin url")
 		return errors.New("Couldn't parse git remote origin url")
 	}
-	/*typ := getPathType(repo)
-	if typ != SSH {
-		repo = getSSHPath(repo)
-	}
-	log.Debug("Updating remote origin URL to: %v", repo)
-	cmd := exec.Command("git", "remote", "set-url", "origin", repo)
-	log.Debug(" ----> running: git remote set-url origin %v", repo)
-	err := cmd.Run()
+
+	os.Chdir(fullpkgpath)
+	newRepoURL := getSSHPath(repo)
+	cmd = exec.Command("git", "remote", "set-url", "origin", newRepoURL)
+	log.Debug(" ----> running: git remote set-url origin %v", newRepoURL)
+	err = cmd.Run()
 	if err != nil {
-		log.Error("Couldnt update repo origin url!")
-		exitStatus = FAIL
-		return
-	}*/
+		log.Error("Failed to update remote origin: %v", err)
+		return err
+	}
+	log.Debug(" ----> Successfully updated remote origin")
 	return nil
 }

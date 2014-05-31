@@ -98,13 +98,13 @@ func getSSHPath(path string) string {
 	if strings.Count(pkgpath, "/") > 2 {
 		pkgpath = pkgpath[:strings.LastIndex(pkgpath, "/")]
 	}
-	replaceAt(pkgpath, strings.Index(pkgpath, "/"), ":")
+	pkgpath = replaceAt(pkgpath, strings.Index(pkgpath, "/"), ":")
 	pkgpath += ".git"
 
 	return pkgpath
 }
 
-func getGitOriginURL(line string) (string, error) {
+func parseGitOriginURL(line string) (string, error) {
 	buf := bytes.NewBuffer([]byte(line))
 	var giturl string
 	_, err := fmt.Fscanf(buf, "origin %v (push)", &giturl)

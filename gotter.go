@@ -44,7 +44,7 @@ func main() {
 		return nil
 	}
 
-	app.Commands = []cli.Command{getCommand, cloneCommand, linkCommand}
+	app.Commands = []cli.Command{getCommand, cloneCommand, linkCommand, updateRemoteCommand}
 
 	initLogger()
 
