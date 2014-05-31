@@ -1,9 +1,12 @@
 package main
 
 import (
+	"bytes"
+	"errors"
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
 
 	"github.com/codegangsta/cli"
 )
@@ -25,7 +28,13 @@ var (
 		Description: `Clones a package into your GOPATH using the go tool chain, and 
    creates a link between it and your workspace, and if possible updates 
    the repos remote origin to use SSH.`,
-		Action: getCommandAction,
+		Action: func(c *cli.Context) {
+			err := getCommandAction(c)
+			if err != nil {
+				exitStatus = FAIL
+				return
+			}
+		},
 		Flags: []cli.Flag{
 			cli.BoolFlag{"update, u", "Update existing code"},
 			cli.BoolFlag{"force, f", "Force updating and linking (Irreverseible)"},
@@ -33,18 +42,30 @@ var (
 	}
 
 	cloneCommand = cli.Command{
-		Name:   "clone",
-		Usage:  "Clone the repo into your GOPATH",
-		Action: cloneCommandAction,
+		Name:  "clone",
+		Usage: "Clone the repo into your GOPATH",
+		Action: func(c *cli.Context) {
+			err := cloneCommandAction(c)
+			if err != nil {
+				exitStatus = FAIL
+				return
+			}
+		},
 		Flags: []cli.Flag{
 			cli.BoolFlag{"update, u", "Update existing code"},
 		},
 	}
 
 	linkCommand = cli.Command{
-		Name:   "link",
-		Usage:  "Create a link from the GOPATH/project to WORKSPACE/project",
-		Action: linkCommandAction,
+		Name:  "link",
+		Usage: "Create a link from the GOPATH/project to WORKSPACE/project",
+		Action: func(c *cli.Context) {
+			err := linkCommandAction(c)
+			if err != nil {
+				exitStatus = FAIL
+				return
+			}
+		},
 		Flags: []cli.Flag{
 			cli.BoolFlag{"update, u", "Update existing link"},
 			cli.BoolFlag{"force, f", "Force updating and linking (Irreverseible)"},
@@ -54,34 +75,51 @@ var (
 	updateRemoteCommand = cli.Command{
 		Name:  "update-remote",
 		Usage: "Updates the git remote origin url to use SSH",
+		Action: func(c *cli.Context) {
+			err := updateRemoteCommandAction(c)
+			if err != nil {
+				exitStatus = FAIL
+				return
+			}
+		},
 	}
 )
 
-func getCommandAction(c *cli.Context) {
-	cloneCommandAction(c)
-	linkCommandAction(c)
-
+func getCommandAction(c *cli.Context) error {
+	err := cloneCommandAction(c)
+	if err != nil {
+		return err
+	}
+	err = linkCommandAction(c)
+	if err != nil {
+		return err
+	}
+	err = updateRemoteCommandAction(c)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
-func cloneCommandAction(c *cli.Context) {
+func cloneCommandAction(c *cli.Context) error {
 	pkgpath := projectFromURL(c.Args().First())
 	log.Debug("Getting package: %v", pkgpath)
+	var err error
 	if c.Bool("update") {
 		log.Debug(" ----> running %v", concat("go", " ", "get", " -u ", pkgpath))
-		err := pipeFromExec(os.Stdout, "go", "get", "-u", pkgpath)
-		if err != nil {
-			panic(err)
-		}
+		err = pipeFromExec(os.Stdout, "go", "get", "-u", pkgpath)
 	} else {
 		log.Debug(" ----> running %v", concat("go", " ", "get", " ", pkgpath))
-		err := pipeFromExec(os.Stdout, "go", "get", pkgpath)
-		if err != nil {
-			panic(err)
-		}
+		err = pipeFromExec(os.Stdout, "go", "get", pkgpath)
 	}
+	if err != nil {
+		log.Error("Couldn't get package: %v", err)
+		return err
+	}
+	return nil
 }
 
-func linkCommandAction(c *cli.Context) {
+func linkCommandAction(c *cli.Context) error {
 	pkgpath := projectFromURL(c.Args().First())
 	pkg := pkgFromPath(pkgpath)
 	workspacepath := concat(WORKSPACE, "/", pkg)
@@ -100,15 +138,14 @@ func linkCommandAction(c *cli.Context) {
 				log.Warning("[WARNING]: Link already exists!")
 				symlink, _ := filepath.EvalSymlinks(fullworkspacepath)
 				log.Warning(" ----> %v -> %v", workspacepath, symlink)
-				return
+				return errors.New("Link already exists")
 			}
 		} else if c.Bool("force") {
 			log.Warning(" ----> removing %v", workspacepath)
 			os.Remove(fullworkspacepath)
 		} else {
 			log.Error(" ----> [ERROR]: File/Folder already exists at %v, if you wish to proceed use -f", workspacepath)
-			exitStatus = FAIL
-			return
+			return errors.New("File/Folder already exists")
 		}
 	}
 
@@ -117,15 +154,43 @@ func linkCommandAction(c *cli.Context) {
 	err := cmd.Run()
 	if err != nil {
 		log.Error("Failed to create link: %v", err)
-		exitStatus = FAIL
-		return
+		return err
 	}
 	log.Debug(" ----> Successfully linked!")
+	return nil
 }
 
-func updateRemoteCommandAction(c *cli.Context) {
-	repo := c.Args().First()
-	typ := getPathType(repo)
+func updateRemoteCommandAction(c *cli.Context) error {
+	path := c.Args().First()
+	pkgpath := projectFromURL(path)
+	fullpkgpath := getAbsPath(concat(GOPATH, "/src/", pkgpath))
+	log.Debug("Update remote origin URL for repo: %v", pkgpath)
+
+	os.Chdir(fullpkgpath)
+	cmd := exec.Command("git", "remote", "-v")
+	log.Debug(" ----> running: git remote -v")
+
+	var buf bytes.Buffer
+	cmd.Stdout = &buf
+	err := cmd.Run()
+	if err != nil {
+		log.Error("Couldn't update remote url: %v", err)
+		return err
+	}
+
+	endpoints := strings.Split(buf.String(), "\n")
+	var repo string
+	for _, line := range endpoints {
+		url, err := getGitOriginURL(line)
+		if err == nil {
+			repo = url
+		}
+	}
+	if repo == "" {
+		log.Error("Couldn't parse git remote origin url")
+		return errors.New("Couldn't parse git remote origin url")
+	}
+	/*typ := getPathType(repo)
 	if typ != SSH {
 		repo = getSSHPath(repo)
 	}
@@ -137,5 +202,6 @@ func updateRemoteCommandAction(c *cli.Context) {
 		log.Error("Couldnt update repo origin url!")
 		exitStatus = FAIL
 		return
-	}
+	}*/
+	return nil
 }

@@ -1,6 +1,8 @@
 package main
 
 import (
+	"bytes"
+	"fmt"
 	"io"
 	"net/url"
 	"os"
@@ -100,4 +102,14 @@ func getSSHPath(path string) string {
 	pkgpath += ".git"
 
 	return pkgpath
+}
+
+func getGitOriginURL(line string) (string, error) {
+	buf := bytes.NewBuffer([]byte(line))
+	var giturl string
+	_, err := fmt.Fscanf(buf, "origin %v (push)", &giturl)
+	if err != nil {
+		return "", err
+	}
+	return giturl, nil
 }
