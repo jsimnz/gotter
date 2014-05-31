@@ -81,7 +81,7 @@ $ go get github.com/jsimnz/gotter
 Both x86 & x64. Go >= Go1
 - Linux (Tested)
 - OSX
-- Windows
+- Windows (Not sure, love for someone to test it)
 
 ## TODO
 - ~~Finish remote origin URL update~~
