@@ -17,7 +17,7 @@ It uses the same syntax as `go get` so you should already be firmiliar with it. 
 
 ## Usage
 
-#### download, link, and update origin URL of a Go package
+#### Download, link, and update origin URL of a Go package
 ```
 $ gotter get github.com/jsimnz/gotter
 ```
@@ -26,18 +26,25 @@ This will download your package using the go tool chain, create a symlink from y
 
 Notice that it uses the same syntax as `go get` for the URL. The package FQN. But it also supports other git URLs such as `git://URL`. `http(s)://URL`. and even `git@URL:repo.git`. If you use the latter URLs and not the FQN, It will keep the remote origin URL as is. 
 
-#### Just download
+#### Download (only)
 ```
 $ gotter clone github.com/jsimnz/gotter
 ```
 This will use the go tool chain to download your package, just like before, but won't create a symlink to your `$WORKSPACE`, and won't update the origin URL.
 
-#### Link the package
+#### Link the package (only)
 ```
 $ gotter link github.com/jsimnz/gotter
 ```
 
 This will create a symlink from your $GOPATH/project to your $WORKSPACE/project
+
+#### Update remote origin to SSH
+```
+$ gotter update-remote github.com/jsimnz/gotter
+```
+
+This will update the local git repo's remote origin url to use SSH. This is only actually run if the origin url isn't already using SSH.
 
 #### For help
 ```
@@ -54,9 +61,9 @@ $ sudo make install
 ```
 
 ## TODO
-- Finish remote origin URL update
+- ~~Finish remote origin URL update~~
+- ~~Expose remote origin as a sub command~~
 - Use config file to set `$WORKSPACE` and other settings
-- Expose remote origin as a sub command
 
 ## License
 
