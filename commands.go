@@ -125,7 +125,6 @@ func linkCommandAction(c *cli.Context) {
 
 func updateRemoteCommandAction(c *cli.Context) {
 	repo := c.Args().First()
-	pkgpath := projectFromURL(repo)
 	typ := getPathType(repo)
 	if typ != SSH {
 		repo = getSSHPath(repo)
