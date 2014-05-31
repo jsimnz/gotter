@@ -22,13 +22,14 @@ It uses the same syntax as `go get` so you should already be firmiliar with it. 
 $WORKSPACE, and $GOPATH enviroment variables must be set
 
 Example
+```
 ~
 +-- Workspace/
 	+-- Go/
 		+-- bin/
 		+-- pkg/
 		+-- src/
-
+```
 Then set your enviroment variables as follows
 ```
 $ export WORKSPACE=~/Workspace
