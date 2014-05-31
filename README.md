@@ -14,7 +14,7 @@ This tool is still under development, but is currently stable enough to use (I d
 
 ## How it works
 
-It uses the same syntax as `go get` so you should already be firmiliar with it. When you call `gotter get` it uses the go toolchain to download your package/repo into it's appropriate fully quantified name folder. Then creates a symlink between that and a defined `$WORKSPACE`, and finally (TODO), if possible updates the `git remote origin` of the package to use ssh so you can use your public key authentication.
+It uses the same syntax as `go get` so you should already be firmiliar with it. When you call `gotter get` it uses the go toolchain to download your package/repo into it's appropriate fully quantified name folder. Then creates a symlink between that and a defined `$WORKSPACE`, and finally, if possible updates the `git remote origin` of the package to use ssh so you can use your public key authentication.
 
 ## Usage
 
@@ -70,14 +70,18 @@ This will update the local git repo's remote origin url to use SSH. This is only
 $ gotter --help OR gotter -h
 ```
 
-
-
 ## Install
 
 You can simply 
 ```
 $ go get github.com/jsimnz/gotter
 ```
+
+## Supported Platforms
+Both x86 & x64. Go >= Go1
+- Linux (Tested)
+- OSX
+- Windows
 
 ## TODO
 - ~~Finish remote origin URL update~~
