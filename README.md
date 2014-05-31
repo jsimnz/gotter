@@ -19,7 +19,7 @@ It uses the same syntax as `go get` so you should already be firmiliar with it. 
 
 #### download, link, and update origin URL of a Go package
 ```
-gotter get github.com/jsimnz/gotter
+$ gotter get github.com/jsimnz/gotter
 ```
 
 This will download your package using the go tool chain, create a symlink from your package folder in your `$GOPATH` and will update the remote origin URL.
@@ -28,25 +28,30 @@ Notice that it uses the same syntax as `go get` for the URL. The package FQN. Bu
 
 #### Just download
 ```
-gotter clone github.com/jsimnz/gotter
+$ gotter clone github.com/jsimnz/gotter
 ```
 This will use the go tool chain to download your package, just like before, but won't create a symlink to your `$WORKSPACE`, and won't update the origin URL.
 
 #### Link the package
 ```
-gotter link github.com/jsimnz/gotter
+$ gotter link github.com/jsimnz/gotter
 ```
 
 This will create a symlink from your $GOPATH/project to your $WORKSPACE/project
 
 #### For help
 ```
-gotter --help OR gotter -h
+$ gotter --help OR gotter -h
 ```
 
 ## Install
 
-You can simply `go get github.com/jsimnz/gotter`
+You can simply 
+```
+$ go get -d github.com/jsimnz/gotter
+$ make
+$ sudo make install
+```
 
 ## TODO
 - Finish remote origin URL update
