@@ -76,9 +76,7 @@ $ gotter --help OR gotter -h
 
 You can simply 
 ```
-$ go get -d github.com/jsimnz/gotter
-$ make
-$ sudo make install
+$ go get github.com/jsimnz/gotter
 ```
 
 ## TODO
