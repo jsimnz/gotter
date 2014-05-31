@@ -23,8 +23,9 @@ type repoType int
 
 var (
 	getCommand = cli.Command{
-		Name:  "get",
-		Usage: "'go get' a repo, and link it to your workspace",
+		Name:      "get",
+		ShortName: "g",
+		Usage:     "'go get' a repo, and link it to your workspace",
 		Description: `Clones a package into your GOPATH using the go tool chain, and 
    creates a link between it and your workspace, and if possible updates 
    the repos remote origin to use SSH.`,
@@ -43,8 +44,9 @@ var (
 	}
 
 	cloneCommand = cli.Command{
-		Name:  "clone",
-		Usage: "Clone the repo into your GOPATH",
+		Name:      "clone",
+		ShortName: "c",
+		Usage:     "Clone the repo into your GOPATH",
 		Action: func(c *cli.Context) {
 			err := cloneCommandAction(c)
 			if err != nil {
@@ -58,8 +60,9 @@ var (
 	}
 
 	linkCommand = cli.Command{
-		Name:  "link",
-		Usage: "Create a link from the GOPATH/project to WORKSPACE/project",
+		Name:      "link",
+		ShortName: "l",
+		Usage:     "Create a link from the GOPATH/project to WORKSPACE/project",
 		Action: func(c *cli.Context) {
 			err := linkCommandAction(c)
 			if err != nil {
@@ -74,8 +77,9 @@ var (
 	}
 
 	updateRemoteCommand = cli.Command{
-		Name:  "update-remote",
-		Usage: "Updates the git remote origin url to use SSH",
+		Name:      "update-remote",
+		ShortName: "u",
+		Usage:     "Updates the git remote origin url to use SSH",
 		Action: func(c *cli.Context) {
 			err := updateRemoteCommandAction(c)
 			if err != nil {
