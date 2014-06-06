@@ -118,13 +118,9 @@ func cloneCommandAction(c *cli.Context) error {
 	args := []string{"get"}
 	if c.Bool("update") {
 		args = append(args, "-u")
-		//log.Debug(" ----> running %v", concat("go", " ", "get", " -u ", pkgpath))
-		//err = pipeFromExec(os.Stdout, "go", "get", "-u", pkgpath)
 	}
 	if c.Bool("download-only") {
 		args = append(args, "-d")
-		//log.Debug(" ----> running %v", concat("go", " ", "get", " ", pkgpath))
-		//err = pipeFromExec(os.Stdout, "go", "get", pkgpath)
 	}
 	args = append(args, pkgpath)
 
