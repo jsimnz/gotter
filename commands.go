@@ -39,9 +39,10 @@ var (
 		},
 		Flags: []cli.Flag{
 			cli.BoolFlag{"update, u", "Update existing code"},
+			cli.BoolFlag{"download-only, d", "Only download the code, don't install with the go toolchain (go build, go install)"},
 			cli.BoolFlag{"force, f", "Force updating and linking (Irreverseible)"},
 			cli.BoolFlag{"no-ssh", "Do not update the remote origin to use SSH"},
-			cli.StringFlag{"ssh-user", "git", "Set the user for the SSH url (Default: git)"},
+			cli.StringFlag{"ssh-user", "<user>", "Set the user for the SSH url (Default: git)"},
 		},
 	}
 
@@ -57,6 +58,7 @@ var (
 		},
 		Flags: []cli.Flag{
 			cli.BoolFlag{"update, u", "Update existing code"},
+			cli.BoolFlag{"download-only, d", "Only download the code, don't install with the go toolchain (go build, go install)"},
 		},
 	}
 
@@ -113,18 +115,27 @@ func getCommandAction(c *cli.Context) error {
 func cloneCommandAction(c *cli.Context) error {
 	pkgpath := projectFromURL(c.Args().First())
 	log.Info("Getting package: %v", pkgpath)
-	var err error
+	args := []string{"get"}
 	if c.Bool("update") {
-		log.Debug(" ----> running %v", concat("go", " ", "get", " -u ", pkgpath))
-		err = pipeFromExec(os.Stdout, "go", "get", "-u", pkgpath)
-	} else {
-		log.Debug(" ----> running %v", concat("go", " ", "get", " ", pkgpath))
-		err = pipeFromExec(os.Stdout, "go", "get", pkgpath)
+		args = append(args, "-u")
+		//log.Debug(" ----> running %v", concat("go", " ", "get", " -u ", pkgpath))
+		//err = pipeFromExec(os.Stdout, "go", "get", "-u", pkgpath)
 	}
+	if c.Bool("download-only") {
+		args = append(args, "-d")
+		//log.Debug(" ----> running %v", concat("go", " ", "get", " ", pkgpath))
+		//err = pipeFromExec(os.Stdout, "go", "get", pkgpath)
+	}
+	args = append(args, pkgpath)
+
+	log.Debug(" ----> running go %v", concatWithSpace(args...))
+	err := pipeFromExec(os.Stdout, "go", args...)
 	if err != nil {
 		log.Error("Couldn't get package: %v", err)
 		return err
 	}
+
+	log.Debug(" ----> Successfully got package!")
 	return nil
 }
 
