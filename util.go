@@ -78,6 +78,18 @@ func concat(strs ...string) string {
 	return final
 }
 
+func concatWithSpace(strs ...string) string {
+	var final string
+	for i, str := range strs {
+		if i > 0 {
+			final += " " + str
+		} else {
+			final += str
+		}
+	}
+	return final
+}
+
 func getPathType(path string) repoType {
 	if strings.HasPrefix(path, "http://") {
 		return HTTP
