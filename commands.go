@@ -76,6 +76,19 @@ var (
 			cli.BoolFlag{"update, u", "Update existing link"},
 			cli.BoolFlag{"force, f", "Force updating and linking (Irreverseible)"},
 		},
+		Subcommands: []cli.Command{
+			{
+				Name:  "rm",
+				Usage: "Remove workspace link",
+				Action: func(c *cli.Context) {
+					err := rmLinkSubCommandAction(c)
+					if err != nil {
+						exitStatus = FAIL
+						return
+					}
+				},
+			},
+		},
 	}
 
 	updateRemoteCommand = cli.Command{
@@ -90,6 +103,30 @@ var (
 		},
 		Flags: []cli.Flag{
 			cli.StringFlag{"ssh-user", "git", "Set the user for the SSH url (Default: git)"},
+		},
+	}
+
+	rmCommand = cli.Command{
+		Name:  "rm",
+		Usage: "Removes both the link and the original project folder",
+		Action: func(c *cli.Context) {
+			err := rmCommandAction(c)
+			if err != nil {
+				exitStatus = FAIL
+				return
+			}
+		},
+	}
+
+	newCommand = cli.Command{
+		Name:  "new",
+		Usage: "Creates a new project with, a GOPATH folder, symlink, and",
+		Action: func(c *cli.Context) {
+			err := newCommandAction(c)
+			if err != nil {
+				exitStatus = FAIL
+				return
+			}
 		},
 	}
 )
@@ -218,5 +255,88 @@ func updateRemoteCommandAction(c *cli.Context) error {
 		return err
 	}
 	log.Debug(" ----> Successfully updated remote origin")
+	return nil
+}
+
+func rmLinkSubCommandAction(c *cli.Context) error {
+	log.Info("Removing workspace link")
+	path := c.Args().First()
+	pkg := pkgFromPath(path)
+	workspacepath := getAbsPath(concat(WORKSPACE, "/", pkg))
+	cmd := exec.Command("rm", workspacepath)
+	log.Debug(" ----> running: rm %s", workspacepath)
+	err := cmd.Run()
+	if err != nil {
+		log.Error("Failed to remove workspace link")
+		return err
+	}
+	log.Debug(" ----> successfully removed workspace link")
+	return nil
+}
+
+func rmCommandAction(c *cli.Context) error {
+	if err := rmLinkSubCommandAction(c); err != nil {
+		log.Error("Failed to remove project")
+		return err
+	}
+	log.Info("Removing project")
+	path := c.Args().First()
+	fullpkgpath := getAbsPath(concat(GOPATH, "/src/", projectFromURL(path)))
+	cmd := exec.Command("rm", "-rf", fullpkgpath)
+	log.Debug(" ----> running rm -rf %s", fullpkgpath)
+	err := cmd.Run()
+	if err != nil {
+		log.Error("Failed to removed project folder")
+		return err
+	}
+	log.Debug(" ----> successfully removed project folder")
+	return nil
+}
+
+func newCommandAction(c *cli.Context) error {
+	log.Info("Creating new project")
+	path := c.Args().First()
+	pkgpath := projectFromURL(path)
+	fullpkgpath := getAbsPath(concat(GOPATH, "/src/", pkgpath))
+
+	cmd := exec.Command("mkdir", fullpkgpath)
+	log.Debug(" ----> running mkdir %s", fullpkgpath)
+	err := cmd.Run()
+	if err != nil {
+		log.Error("Failed to create project folder: %v", err)
+		return err
+	}
+	log.Debug(" ----> successfully created project folder")
+
+	// initialite git
+	log.Info("Initializing git repo")
+	os.Chdir(fullpkgpath)
+	cmd = exec.Command("git", "init")
+	log.Debug(" ----> running git init")
+	err = cmd.Run()
+	if err != nil {
+		log.Error("Failed to initialize git repo")
+		return err
+	}
+	log.Debug(" ----> successfully initialized git repo")
+
+	// add git remote origin
+	log.Info("Adding remote origin")
+	gitorigin := getSSHPath(path, "git")
+	cmd = exec.Command("git", "remote", "add", "origin", gitorigin)
+	log.Debug(" ----> running git remote add origin %v", gitorigin)
+	err = cmd.Run()
+	if err != nil {
+		log.Error("Failed to add remote origin")
+		return err
+	}
+	log.Debug(" ----> successfully added git remote origin")
+
+	err = linkCommandAction(c)
+	if err != nil {
+		return err
+	}
+
+	log.Debug(" ----> successfully created new project %v", path)
 	return nil
 }

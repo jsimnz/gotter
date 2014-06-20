@@ -32,7 +32,7 @@ func main() {
 	app.Name = "gotter"
 	app.Author = "John-Alan Simmons <simmons.johnalan@gmail.com>"
 	app.Usage = "Utlity to unify and manage Go projects into a single workspace"
-	app.Version = "0.1.0-rc1"
+	app.Version = "0.1.0-rc2"
 
 	// Overwrite default 'version' shorthand 'v' flag
 	cli.VersionFlag.Name = "version"
@@ -67,7 +67,7 @@ func main() {
 		return nil
 	}
 
-	app.Commands = []cli.Command{getCommand, cloneCommand, linkCommand, updateRemoteCommand}
+	app.Commands = []cli.Command{getCommand, cloneCommand, linkCommand, updateRemoteCommand, rmCommand, newCommand}
 
 	defer func() {
 		if exitStatus == FAIL {
