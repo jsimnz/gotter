@@ -102,7 +102,7 @@ var (
 			}
 		},
 		Flags: []cli.Flag{
-			cli.StringFlag{"ssh-user", "git", "Set the user for the SSH url (Default: git)"},
+			cli.StringFlag{"user", "git", "Set the user for the SSH url (Default: git)"},
 		},
 	}
 
@@ -124,6 +124,23 @@ var (
 		Action: func(c *cli.Context) {
 			err := newCommandAction(c)
 			if err != nil {
+				exitStatus = FAIL
+				return
+			}
+		},
+	}
+
+	makeCommand = cli.Command{
+		Name:  "make",
+		Usage: "Make all the go binaries of a project",
+		Flags: []cli.Flag{
+			cli.StringFlag{"folder", "cmd", "Set which folder containes the collection of binary go files (Default: cmd)"},
+			cli.StringFlag{"file", "make.go", "Give the name of the make file to run or generate"},
+			cli.BoolFlag{"update, u", "Should update the make file"},
+		},
+		Action: func(c *cli.Context) {
+			err := makeCommandAction(c)
+			if err != nik {
 				exitStatus = FAIL
 				return
 			}
